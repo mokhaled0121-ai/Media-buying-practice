@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Store - Tracking Practice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f6fa;
+      color: #222;
+    }
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .product {
+      font-size: 90px;
+      margin: 20px;
+    }
+    button {
+      padding: 13px 20px;
+      margin: 8px;
+      border: 0;
+      border-radius: 7px;
+      background: #2457d6;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button:hover { background: #163da5; }
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .note {
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Demo Store</h1>
+    <p>A test store for media buying practice</p>
+
+    <div class="product">👕</div>
+    <h2>Classic T-Shirt</h2>
+    <p>Price: EGP 500</p>
+
+    <button id="view-product">View Product</button>
+    <button id="add-to-cart">Add to Cart</button>
+    <button id="checkout">Start Checkout</button>
+    <button id="purchase">Complete Test Purchase</button>
+
+    <p id="cart">Cart: 0 items</p>
+    <p id="message">Ready for tracking tests.</p>
+    <p class="note">
+      Demo website only. No real payments or personal data.
+    </p>
+  </div>
+
+  <script>
+    let cartCount = 0;
+
+    function trackEvent(eventName, details = {}) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: eventName,
+        ...details
+      });
+      console.log("Tracking test:", eventName, details);
+    }
+
+    document.getElementById("view-product").onclick = function () {
+      trackEvent("view_item", {
+        currency: "EGP",
+        value: 500,
+        items: [{
+          item_id: "TSHIRT01",
+          item_name: "Classic T-Shirt",
+          price: 500,
+          quantity: 1
+        }]
+      });
+      document.getElementById("message").textContent =
+        "Product view event sent.";
+    };
+
+    document.getElementById("add-to-cart").onclick = function () {
+      cartCount++;
+      document.getElementById("cart").textContent =
+        "Cart: " + cartCount + " items";
+
+      trackEvent("add_to_cart", {
+        currency: "EGP",
+        value: 500,
+        items: [{
+          item_id: "TSHIRT01",
+          item_name: "Classic T-Shirt",
+          price: 500,
+          quantity: 1
+        }]
+      });
+
+      document.getElementById("message").textContent =
+        "Add to cart event sent.";
+    };
+
+    document.getElementById("checkout").onclick = function () {
+      if (cartCount === 0) {
+        document.getElementById("message").textContent =
+          "Add a product to the cart first.";
+        return;
+      }
+
+      trackEvent("begin_checkout", {
+        currency: "EGP",
+        value: cartCount * 500
+      });
+
+      document.getElementById("message").textContent =
+        "Test checkout started.";
+    };
+
+    document.getElementById("purchase").onclick = function () {
+      if (cartCount === 0) {
+        document.getElementById("message").textContent =
+          "Add a product to the cart first.";
+        return;
+      }
+
+      const orderId = "TEST-" + Date.now();
+
+      trackEvent("purchase", {
+        transaction_id: orderId,
+        currency: "EGP",
+        value: cartCount * 500
+      });
+
+      document.getElementById("message").textContent =
+        "Test purchase event sent: " + orderId;
+      cartCount = 0;
+      document.getElementById("cart").textContent = "Cart: 0 items";
+    };
+  </script>
+</body>
+</html>
